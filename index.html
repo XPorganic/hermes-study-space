@@ -777,10 +777,24 @@
         <span class="brand-accent">7天深度研究</span>
       </div>
       <ul class="day-nav" id="dayNav"></ul>
-      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
-        <button class="btn btn-ghost" onclick="navigateTo('overview')" style="width:100%;justify-content:center;">
+      <div style="margin-bottom:12px;padding:0 4px;">
+        <div style="position:relative;">
+          <input type="text" id="searchInput" placeholder="🔍 搜索研究内容..."
+            style="width:100%;padding:8px 10px;background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);border-radius:6px;color:var(--text-secondary);font-size:13px;font-family:var(--font-sans);outline:none;"
+            onfocus="this.style.borderColor='var(--accent-indigo)'"
+            onblur="this.style.borderColor='var(--border-subtle)'"
+            oninput="searchResearch(this.value)">
+          <div id="searchResults" style="display:none;position:absolute;left:0;right:0;background:var(--bg-surface);border:1px solid var(--border-standard);border-radius:8px;max-height:300px;overflow-y:auto;z-index:100;margin-top:2px;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
+        </div>
+      </div>
+      <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+        <button class="btn btn-ghost" onclick="navigateTo('overview')" style="width:100%;justify-content:center;margin-bottom:4px;">
           📊 总览
         </button>
+        <a href="https://github.com/XPorganic/hermes-study-space" target="_blank" class="btn btn-ghost" style="width:100%;justify-content:center;text-decoration:none;display:flex;gap:6px;">
+          <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
       </div>
     </nav>
 
@@ -818,14 +832,28 @@
           renderOverview();
         }
       } catch (e) {
+        // Fallback: load from static JSON (GitHub Pages mode)
+        loadStaticData();
+      }
+    }
+
+    async function loadStaticData() {
+      try {
+        const res2 = await fetch('data/research.json');
+        if (!res2.ok) throw new Error('Not found');
+        researchData = await res2.json();
+        renderSidebar();
+        renderOverview();
+      } catch(e2) {
         document.getElementById('mainContent').innerHTML = `
           <div class="empty-state">
             <span class="icon">🚀</span>
-            <h3>正在准备研究资料...</h3>
-            <p>等待 Cron 任务生成第一天数据</p>
+            <h3>数据加载失败</h3>
+            <p>请确认 data/research.json 文件存在</p>
           </div>
         `;
       }
+    }
     }
 
     // ===== RENDER SIDEBAR =====
@@ -898,10 +926,20 @@
           <p class="summary">${researchData.subtitle}</p>
         </div>
 
-        <div class="status-bar">
-          <div class="status-item">已完成 <span class="value">${completed}/${total}</span> 天</div>
-          <div class="status-item">进度 <span class="value">${progress}%</span></div>
-          <div class="status-item">下一期 <span class="value">Day ${completed + 1}</span></div>
+        <div class="status-bar" style="display:flex;align-items:center;gap:20px;">
+          <div style="position:relative;width:56px;height:56px;flex-shrink:0;">
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+              <circle cx="28" cy="28" r="24" fill="none" stroke="var(--green)" stroke-width="4"
+                stroke-dasharray="150.8" stroke-dashoffset="${150.8 - (150.8 * completed / total)}"
+                stroke-linecap="round" transform="rotate(-90 28 28)"/>
+            </svg>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:600;color:var(--text-primary);font-family:var(--font-mono);">${progress}%</div>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <div class="status-item">已完成 <span class="value">${completed}/${total}</span> 天</div>
+            <div class="status-item">进度 <span class="value">${progress}%</span></div>
+          </div>
         </div>
 
         <div class="phase-overview">
@@ -978,6 +1016,11 @@
         ${sectionsHtml}
         ${reflectionsHtml}
 
+        <div class="day-navigation" style="display:flex;justify-content:space-between;align-items:center;margin:32px 0;padding:16px 0;border-top:1px solid var(--border-subtle);">
+          <button class="btn btn-ghost" onclick="navigateTo(${phase.day - 1})" style="${phase.day <= 1 ? 'visibility:hidden' : ''}">← Day ${phase.day - 1}</button>
+          <button class="btn btn-ghost" onclick="navigateTo('overview')">📊 返回总览</button>
+          <button class="btn btn-ghost" onclick="navigateTo(${phase.day + 1})" style="${phase.day >= researchData.phases.length ? 'visibility:hidden' : ''}">Day ${phase.day + 1} →</button>
+        </div>
         <div class="comments-section">
           <h2>💬 你的反馈</h2>
           <div class="comment-form" id="commentForm">
@@ -1114,6 +1157,60 @@
         }
       } catch(e) {}
     }, 30000);
+    // ===== SEARCH =====
+    function searchResearch(query) {
+      const resultsDiv = document.getElementById('searchResults');
+      if (!query || query.length < 1 || !researchData) {
+        resultsDiv.style.display = 'none';
+        return;
+      }
+      const q = query.toLowerCase();
+      let results = [];
+      researchData.phases.forEach(phase => {
+        const inTitle = phase.title.toLowerCase().includes(q);
+        const inSummary = phase.summary.toLowerCase().includes(q);
+        if (inTitle || inSummary) {
+          results.push({ day: phase.day, title: phase.title, match: phase.summary.slice(0, 120) + '...' });
+        }
+        phase.sections.forEach(s => {
+          const text = (s.heading + ' ' + s.content).replace(/<[^>]+>/g, '').toLowerCase();
+          if (text.includes(q)) {
+            results.push({ day: phase.day, title: s.heading, match: text.slice(0, 120).trim() + '...' });
+          }
+        });
+      });
+      // Deduplicate
+      const seen = new Set();
+      results = results.filter(r => {
+        const key = r.day + '|' + r.title;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      results = results.slice(0, 20);
+
+      if (results.length === 0) {
+        resultsDiv.innerHTML = '<div style="padding:12px;color:var(--text-quaternary);font-size:13px;text-align:center;">没有找到匹配结果</div>';
+      } else {
+        resultsDiv.innerHTML = results.map(r => `
+          <div onclick="navigateTo(${r.day});document.getElementById('searchInput').value='';document.getElementById('searchResults').style.display='none';"
+               style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border-subtle);font-size:13px;">
+            <div style="color:var(--accent-violet);font-weight:500;margin-bottom:2px;font-size:12px;">Day ${r.day}: ${r.title}</div>
+            <div style="color:var(--text-tertiary);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.match}</div>
+          </div>
+        `).join('');
+      }
+      resultsDiv.style.display = 'block';
+    }
+
+    // Close search on click outside
+    document.addEventListener('click', function(e) {
+      const searchInput = document.getElementById('searchInput');
+      const resultsDiv = document.getElementById('searchResults');
+      if (searchInput && resultsDiv && !e.target.closest('#searchInput') && !e.target.closest('#searchResults')) {
+        resultsDiv.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
