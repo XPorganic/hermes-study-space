@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>《挽救计划》· 理想伙伴关系研究日志</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ===== LINEAR DESIGN SYSTEM ===== */
+    :root {
+      --bg-deep: #08090a;
+      --bg-panel: #0f1011;
+      --bg-surface: #191a1b;
+      --bg-secondary: #28282c;
+      --text-primary: #f7f8f8;
+      --text-secondary: #d0d6e0;
+      --text-tertiary: #8a8f98;
+      --text-quaternary: #62666d;
+      --accent-indigo: #5e6ad2;
+      --accent-violet: #7170ff;
+      --accent-hover: #828fff;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-standard: rgba(255,255,255,0.08);
+      --border-solid: #23252a;
+      --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      font-feature-settings: 'cv01', 'ss03';
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ===== LAYOUT ===== */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border-subtle);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-brand h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.24px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .sidebar-brand p {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+    }
+
+    .sidebar-brand .brand-accent {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 2px 8px;
+      background: rgba(94,106,210,0.15);
+      color: var(--accent-violet);
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .day-nav { list-style: none; flex: 1; }
+    .day-nav li { margin-bottom: 2px; }
+
+    .day-nav a {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.15s ease;
+      gap: 10px;
+    }
+
+    .day-nav a:hover {
+      background: rgba(255,255,255,0.03);
+      color: var(--text-primary);
+    }
+
+    .day-nav a.active {
+      background: rgba(94,106,210,0.12);
+      color: var(--accent-violet);
+    }
+
+    .day-nav .day-indicator {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+    }
+
+    .day-indicator.completed {
+      background: var(--green);
+      color: white;
+    }
+
+    .day-indicator.in-progress {
+      background: var(--accent-indigo);
+      color: white;
+    }
+
+    .day-indicator.pending {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-quaternary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .day-nav .day-label {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .day-nav .day-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .day-status-dot.completed { background: var(--green); }
+    .day-status-dot.in-progress { background: var(--accent-violet); animation: pulse-dot 2s infinite; }
+    .day-status-dot.pending { background: var(--text-quaternary); }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      flex: 1;
+      padding: 48px 56px;
+      max-width: 900px;
+      margin: 0 auto;
+      min-width: 0;
+    }
+
+    /* ===== HEADER ===== */
+    .page-header { margin-bottom: 48px; }
+
+    .page-header .meta-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .page-header .day-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border-solid);
+      color: var(--text-secondary);
+    }
+
+    .page-header .day-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .page-header .date-text {
+      font-size: 13px;
+      color: var(--text-quaternary);
+      font-weight: 400;
+    }
+
+    .page-header h1 {
+      font-size: 36px;
+      font-weight: 600;
+      letter-spacing: -0.72px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .page-header .summary {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-tertiary);
+      letter-spacing: -0.165px;
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    /* ===== CONTENT SECTIONS ===== */
+    .content-section {
+      margin-bottom: 40px;
+    }
+
+    .content-section h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.24px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .content-section .content-body {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      letter-spacing: -0.165px;
+      line-height: 1.6;
+    }
+
+    .content-body ul, .content-body ol {
+      padding-left: 20px;
+      margin: 12px 0;
+    }
+
+    .content-body li {
+      margin-bottom: 8px;
+    }
+
+    .content-body li strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .content-body p {
+      margin-bottom: 12px;
+    }
+
+    /* ===== CHARACTER CARDS ===== */
+    .character-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .character-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-standard);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .character-card h4 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      letter-spacing: -0.165px;
+    }
+
+    .character-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .character-card li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .character-card li:last-child { border-bottom: none; }
+
+    .phase-list {
+      counter-reset: phase;
+      list-style: none;
+      padding: 0;
+    }
+
+    .phase-list li {
+      counter-increment: phase;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .phase-list li::before {
+      content: counter(phase);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      background: rgba(94,106,210,0.15);
+      color: var(--accent-violet);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .phase-list li strong {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* ===== REFLECTIONS ===== */
+    .reflections-section { margin-bottom: 40px; }
+
+    .reflections-section h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.24px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .reflection-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-standard);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .reflection-card .author-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-violet);
+      margin-bottom: 8px;
+    }
+
+    .reflection-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ===== COMMENTS ===== */
+    .comments-section { margin-bottom: 40px; }
+
+    .comments-section h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.24px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .comment-form {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-standard);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .comment-form textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-standard);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .comment-form textarea:focus {
+      border-color: var(--accent-indigo);
+    }
+
+    .comment-form .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .comment-form .char-count {
+      font-size: 12px;
+      color: var(--text-quaternary);
+      font-family: var(--font-mono);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent-indigo);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.02);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-standard);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .comment-list { list-style: none; }
+
+    .comment-item {
+      padding: 16px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+    }
+
+    .comment-item .comment-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .comment-item .comment-author {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .comment-item .comment-time {
+      font-size: 11px;
+      color: var(--text-quaternary);
+    }
+
+    .comment-item .comment-body {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .comment-empty {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-quaternary);
+      font-size: 14px;
+    }
+
+    .comment-empty .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* ===== STATUS BAR ===== */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .status-item .value {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    /* ===== NOTIFICATION ===== */
+    .notification {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-standard);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      box-shadow: rgba(0,0,0,0.4) 0px 8px 24px;
+      transform: translateX(120%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      border-left: 3px solid var(--green);
+    }
+
+    .notification.error {
+      border-left: 3px solid var(--red);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 64px 32px;
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      color: var(--text-quaternary);
+    }
+
+    /* ===== PHASE OVERVIEW ===== */
+    .phase-overview {
+      margin-bottom: 48px;
+    }
+
+    .phase-overview h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.24px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .phase-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .phase-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .phase-card:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border-standard);
+    }
+
+    .phase-card .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .phase-card .card-day {
+      font-size: 11px;
+      font-weight: 500;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .phase-card .card-status {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .phase-card .card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      letter-spacing: -0.165px;
+    }
+
+    .phase-card .card-summary {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 860px) {
+      .app-wrapper {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        position: static;
+        padding: 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+
+      .sidebar-brand {
+        padding-bottom: 16px;
+        margin-bottom: 12px;
+      }
+
+      .day-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .day-nav li {
+        margin-bottom: 0;
+      }
+
+      .day-nav a {
+        padding: 6px 8px;
+        font-size: 12px;
+      }
+
+      .main-content {
+        padding: 24px 20px;
+      }
+
+      .page-header h1 {
+        font-size: 28px;
+        letter-spacing: -0.56px;
+      }
+
+      .character-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .phase-overview-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content { padding: 16px; }
+      .page-header h1 { font-size: 22px; }
+      .phase-overview-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    /* ===== TIMELINE ===== */
+    .timeline-marker {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper" id="app">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <h1>📽️ 挽救计划 · 研究日志</h1>
+        <p>Grace &amp; Rocky<br>→ 理想伙伴关系</p>
+        <span class="brand-accent">7天深度研究</span>
+      </div>
+      <ul class="day-nav" id="dayNav"></ul>
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+        <button class="btn btn-ghost" onclick="navigateTo('overview')" style="width:100%;justify-content:center;">
+          📊 总览
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <!-- Rendered by JS -->
+    </main>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <script>
+    // ===== DATA =====
+    let researchData = null;
+    let currentDay = null;
+
+    // ===== LOAD DATA =====
+    async function loadData() {
+      try {
+        const res = await fetch('/api/data');
+        if (!res.ok) throw new Error('Failed to load data');
+        researchData = await res.json();
+        renderSidebar();
+        // Check URL hash
+        const hash = window.location.hash.replace('#', '');
+        if (hash === 'overview') {
+          renderOverview();
+        } else if (hash && !isNaN(hash)) {
+          const day = parseInt(hash);
+          const phase = researchData.phases.find(p => p.day === day);
+          if (phase) renderDay(phase);
+          else renderOverview();
+        } else {
+          renderOverview();
+        }
+      } catch (e) {
+        document.getElementById('mainContent').innerHTML = `
+          <div class="empty-state">
+            <span class="icon">🚀</span>
+            <h3>正在准备研究资料...</h3>
+            <p>等待 Cron 任务生成第一天数据</p>
+          </div>
+        `;
+      }
+    }
+
+    // ===== RENDER SIDEBAR =====
+    function renderSidebar() {
+      const nav = document.getElementById('dayNav');
+      nav.innerHTML = '';
+      researchData.phases.forEach(phase => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${phase.day}`;
+        a.innerHTML = `
+          <span class="day-indicator ${phase.status}">${phase.day}</span>
+          <span class="day-label">${phase.title}</span>
+          <span class="day-status-dot ${phase.status}"></span>
+        `;
+        a.onclick = (e) => {
+          e.preventDefault();
+          navigateTo(phase.day);
+        };
+        li.appendChild(a);
+        nav.appendChild(li);
+      });
+
+      // Highlight active
+      const hash = window.location.hash.replace('#', '');
+      nav.querySelectorAll('a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === `#${hash}`) {
+          a.classList.add('active');
+        }
+      });
+    }
+
+    // ===== RENDER OVERVIEW =====
+    function renderOverview() {
+      currentDay = null;
+      window.location.hash = 'overview';
+      renderSidebarActive();
+
+      const completed = researchData.phases.filter(p => p.status === 'completed').length;
+      const total = researchData.phases.length;
+      const progress = Math.round((completed / total) * 100);
+
+      let cardsHtml = researchData.phases.map(phase => {
+        const statusLabels = { completed: '✅ 已完成', 'in-progress': '🔄 进行中', pending: '⏳ 待进行' };
+        return `
+          <div class="phase-card" onclick="navigateTo(${phase.day})">
+            <div class="card-top">
+              <span class="card-day" style="background:${phase.status === 'completed' ? 'rgba(16,185,129,0.15);color:#10b981' : phase.status === 'in-progress' ? 'rgba(94,106,210,0.15);color:#7170ff' : 'rgba(255,255,255,0.05);color:#62666d'}">
+                Day ${phase.day}
+              </span>
+              <span class="card-status" style="font-size:11px;color:var(--text-quaternary)">${statusLabels[phase.status]}</span>
+            </div>
+            <div class="card-title">${phase.title}</div>
+            <div class="card-summary">${phase.summary}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('mainContent').innerHTML = `
+        <div class="page-header">
+          <div class="meta-bar">
+            <span class="day-badge">
+              <span class="dot" style="background:var(--green)"></span>
+              研究进度
+            </span>
+            <span class="date-text">${researchData.startDate} 启动</span>
+          </div>
+          <h1>${researchData.title}</h1>
+          <p class="summary">${researchData.subtitle}</p>
+        </div>
+
+        <div class="status-bar">
+          <div class="status-item">已完成 <span class="value">${completed}/${total}</span> 天</div>
+          <div class="status-item">进度 <span class="value">${progress}%</span></div>
+          <div class="status-item">下一期 <span class="value">Day ${completed + 1}</span></div>
+        </div>
+
+        <div class="phase-overview">
+          <h2>📋 研究阶段一览</h2>
+          <div class="phase-overview-grid">${cardsHtml}</div>
+        </div>
+      `;
+    }
+
+    // ===== RENDER SINGLE DAY =====
+    function renderDay(phase) {
+      currentDay = phase.day;
+      window.location.hash = phase.day;
+      renderSidebarActive();
+
+      const statusLabels = { completed: '✅ 已完成', 'in-progress': '🔄 进行中', pending: '⏳ 待进行' };
+      const statusColors = { completed: 'var(--green)', 'in-progress': 'var(--accent-violet)', pending: 'var(--text-quaternary)' };
+
+      // Build sections HTML
+      let sectionsHtml = phase.sections.map(s => `
+        <div class="content-section">
+          <h2>${s.heading}</h2>
+          <div class="content-body">${s.content}</div>
+        </div>
+      `).join('');
+
+      // Build reflections HTML
+      let reflectionsHtml = '';
+      if (phase.reflections.length > 0) {
+        reflectionsHtml = `
+          <div class="reflections-section">
+            <h2>💭 今日反思</h2>
+            ${phase.reflections.map(r => `
+              <div class="reflection-card">
+                <div class="author-tag">🤖 ${r.author}</div>
+                <p>${r.text}</p>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // Build comments HTML
+      let commentsHtml = phase.comments.map(c => `
+        <li class="comment-item">
+          <div class="comment-header">
+            <span class="comment-author">${c.author}</span>
+            <span class="comment-time">${c.time}</span>
+          </div>
+          <div class="comment-body">${c.body}</div>
+        </li>
+      `).join('');
+
+      const commentsListHtml = commentsHtml || `
+        <div class="comment-empty">
+          <span class="icon">💬</span>
+          暂无反馈 — 留下你的想法吧
+        </div>
+      `;
+
+      document.getElementById('mainContent').innerHTML = `
+        <div class="page-header">
+          <div class="meta-bar">
+            <span class="day-badge">
+              <span class="dot" style="background:${statusColors[phase.status]}"></span>
+              Day ${phase.day} · ${phase.date}
+            </span>
+            <span class="date-text">${statusLabels[phase.status]}</span>
+          </div>
+          <h1>${phase.title}</h1>
+          <p class="summary">${phase.summary}</p>
+        </div>
+
+        ${sectionsHtml}
+        ${reflectionsHtml}
+
+        <div class="comments-section">
+          <h2>💬 你的反馈</h2>
+          <div class="comment-form" id="commentForm">
+            <textarea id="commentInput" placeholder="在这里留下你的想法、问题或调整方向..." maxlength="2000"></textarea>
+            <div class="form-footer">
+              <span class="char-count"><span id="charCount">0</span>/2000</span>
+              <button class="btn btn-primary" id="submitComment" onclick="submitComment()">提交反馈</button>
+            </div>
+          </div>
+          <ul class="comment-list" id="commentList">
+            ${commentsListHtml}
+          </ul>
+        </div>
+      `;
+
+      // Bind char count
+      document.getElementById('commentInput').addEventListener('input', function() {
+        document.getElementById('charCount').textContent = this.value.length;
+      });
+
+      // If pending, disable the form
+      if (phase.status === 'pending') {
+        document.getElementById('commentInput').disabled = true;
+        document.getElementById('commentInput').placeholder = '⏳ 此阶段内容尚未生成，请耐心等待...';
+        document.getElementById('submitComment').disabled = true;
+      }
+    }
+
+    // ===== NAVIGATION =====
+    function navigateTo(target) {
+      if (target === 'overview') {
+        renderOverview();
+      } else if (typeof target === 'number' || !isNaN(target)) {
+        const day = parseInt(target);
+        const phase = researchData.phases.find(p => p.day === day);
+        if (phase) renderDay(phase);
+        else renderOverview();
+      }
+    }
+
+    function renderSidebarActive() {
+      const hash = window.location.hash.replace('#', '');
+      document.querySelectorAll('.day-nav a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === `#${hash}`) {
+          a.classList.add('active');
+        }
+      });
+    }
+
+    // ===== SUBMIT COMMENT =====
+    async function submitComment() {
+      const input = document.getElementById('commentInput');
+      const btn = document.getElementById('submitComment');
+      const text = input.value.trim();
+
+      if (!text) {
+        showNotification('请先输入反馈内容', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '提交中...';
+
+      try {
+        const res = await fetch('/api/comment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            day: currentDay,
+            body: text,
+            author: '你'
+          })
+        });
+
+        if (!res.ok) throw new Error('提交失败');
+
+        // Clear and reload
+        input.value = '';
+        document.getElementById('charCount').textContent = '0';
+        showNotification('✅ 反馈已提交！我会在下次研究中参考你的意见', 'success');
+
+        // Reload data and stay on current day
+        await loadData();
+        if (currentDay) {
+          const phase = researchData.phases.find(p => p.day === currentDay);
+          if (phase) renderDay(phase);
+        }
+      } catch (e) {
+        showNotification('提交失败，请稍后重试', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '提交反馈';
+      }
+    }
+
+    // ===== NOTIFICATION =====
+    function showNotification(message, type = 'success') {
+      const el = document.getElementById('notification');
+      el.textContent = message;
+      el.className = `notification ${type}`;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    // ===== WATCH HASH CHANGES =====
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (!hash || hash === 'overview') { renderOverview(); return; }
+      const phase = researchData?.phases.find(p => p.day === parseInt(hash));
+      if (phase) renderDay(phase);
+      else renderOverview();
+    });
+
+    // ===== INIT =====
+    loadData();
+
+    // Auto-refresh data every 30 seconds (helpful after cron updates)
+    setInterval(async () => {
+      try {
+        const res = await fetch('/api/data?' + Date.now());
+        if (!res.ok) return;
+        const newData = await res.json();
+        if (JSON.stringify(newData) !== JSON.stringify(researchData)) {
+          researchData = newData;
+          const currentHash = window.location.hash.replace('#', '');
+          if (currentHash === 'overview') renderOverview();
+          else if (currentHash && !isNaN(currentHash)) {
+            const phase = researchData.phases.find(p => p.day === parseInt(currentHash));
+            if (phase) renderDay(phase);
+          }
+          renderSidebar();
+          showNotification('🔄 研究日志已更新', 'success');
+        }
+      } catch(e) {}
+    }, 30000);
+  </script>
+</body>
+</html>
